@@ -1,0 +1,11 @@
+.env
+__pycache__/
+*.pyc
+.venv/
+venv/
+
+# Generated on first run from data/papers.md
+faiss_index_papers/
+
+# Local editor settings
+.vscode/

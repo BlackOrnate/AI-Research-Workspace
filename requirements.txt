@@ -1,0 +1,12 @@
+langchain
+langgraph
+langchain-ollama
+langchain-community
+langchain-text-splitters
+langchain-mcp-adapters>=0.3.2,<0.4
+mcp>=1.30,<2  # mcp 2.x moved FastMCP and breaks langchain-mcp-adapters 0.3
+faiss-cpu
+gradio
+httpx
+python-dotenv
+grandalf  # for graph.get_graph().print_ascii()
