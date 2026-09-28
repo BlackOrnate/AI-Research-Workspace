@@ -3,7 +3,7 @@ from langchain.agents import create_agent
 from langchain.agents.middleware import ModelRetryMiddleware
 
 from agents.common import agent_update, ask_agent, create_model
-from state import State
+from state import TaskState
 
 
 CONCEPT_FAIL_TEXT = "Sorry, concept explanations are temporarily unavailable. Please try again later."
@@ -27,7 +27,8 @@ concept_agent = create_agent(
 )
 
 
-async def concept_node(state: State):
+async def concept_node(state: TaskState):
     print("~~~~~~This is Concept Agent~~~~~~")
-    answer = await ask_agent(concept_agent, state["messages"][0].content, CONCEPT_FAIL_TEXT)
-    return agent_update(answer)
+    task = state["task"]
+    answer, tokens = await ask_agent(concept_agent, task["sub_question"], CONCEPT_FAIL_TEXT)
+    return agent_update(task, answer, tokens)

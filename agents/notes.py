@@ -8,7 +8,7 @@ from langchain_mcp_adapters.client import MultiServerMCPClient
 
 from agents.common import agent_update, ask_agent, create_model
 from config import MCP_URL
-from state import State
+from state import TaskState
 
 
 mcp_client = MultiServerMCPClient(
@@ -62,13 +62,14 @@ notes_agent = create_agent(
 )
 
 
-async def notes_node(state: State):
+async def notes_node(state: TaskState):
     print("~~~~~~This is Notes Agent~~~~~~")
-    answer = await ask_agent(
+    task = state["task"]
+    answer, tokens = await ask_agent(
         notes_agent,
-        state["messages"][0].content,
+        task["sub_question"],
         NOTES_FAIL_TEXT,
-        # Pass the user_id from State to the tool
+        # Pass the user_id sent by the supervisor to the tool
         context=UserContext(user_id=state.get("user_id")),
     )
-    return agent_update(answer)
+    return agent_update(task, answer, tokens)

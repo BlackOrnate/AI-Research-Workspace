@@ -2,19 +2,19 @@
 
 [English](README.md) | **简体中文**
 
-一个用 [LangGraph](https://github.com/langchain-ai/langgraph) 构建**Supervisor 模式多智能体系统**的科研场景学习项目。Supervisor 对用户问题进行分类，路由到对应的专业 Agent 处理，最后把 Agent 的结果汇总成最终回复。
+一个用 [LangGraph](https://github.com/langchain-ai/langgraph) 构建**Supervisor 模式多智能体系统**的科研场景学习项目。Supervisor 把用户问题拆分成若干任务，交给多个专业 Agent 并行处理，最后由汇总节点把各 Agent 的结果合并成最终回复。
 
 项目按版本逐步迭代，每个版本只引入一个新想法，并在 GitHub 上打 tag，方便观察设计是怎样一步步演进的。详见 [CHANGELOG.md](CHANGELOG.md) 和 [docs/](docs/)。
 
 每个专业 Agent 演示一种不同的技术：
 
-| Agent | 负责内容 | 技术 |
-| --- | --- | --- |
-| `search` | 在线查找论文 | **工具调用**：调用公开的 OpenAlex API |
-| `library` | 本地论文库中论文的细节 | 基于 Markdown 论文库的 **RAG**，使用 **FAISS** 向量库 |
-| `notes` | 用户自己的阅读列表和笔记 | 工具调用 + **MCP** Server，`user_id` 通过运行时上下文注入 |
-| `concept` | 通用科研概念和术语 | 纯 LLM，不带工具 |
-| `reject` | 与科研无关的问题 | 礼貌拒绝 |
+| Agent       | 负责内容                 | 技术                                                             |
+| ----------- | ------------------------ | ---------------------------------------------------------------- |
+| `search`  | 在线查找论文             | **工具调用**：调用公开的 OpenAlex API                      |
+| `library` | 本地论文库中论文的细节   | 基于 Markdown 论文库的**RAG**，使用 **FAISS** 向量库 |
+| `notes`   | 用户自己的阅读列表和笔记 | 工具调用 +**MCP** Server，`user_id` 通过运行时上下文注入 |
+| `concept` | 通用科研概念和术语       | 纯 LLM，不带工具                                                 |
+| `reject`  | 与科研无关的问题         | 礼貌拒绝                                                         |
 
 所有模型都通过 [Ollama](https://ollama.com) 在本地运行，LangSmith 追踪为可选项。
 
@@ -25,15 +25,16 @@
 ## 架构
 
 ```text
-START -> supervisor_node（分类）
-           ├─ search  -> search_node   (工具: OpenAlex)   ─┐
-           ├─ library -> library_node  (RAG + FAISS)      ─┤
-           ├─ notes   -> notes_node    (工具 + MCP)       ─┼-> supervisor_node（汇总） -> END
-           ├─ concept -> concept_node  (纯 LLM)           ─┤
-           └─ other   -> reject_node   (礼貌拒绝)          ─┘
+START -> supervisor_node（拆分任务）
+           └─ Send × N（1~4 个，并行）
+                ├─ search_node   (工具: OpenAlex)   ─┐
+                ├─ library_node  (RAG + FAISS)      ─┤
+                ├─ notes_node    (工具 + MCP)       ─┼-> summary_node（合并汇总） -> END
+                ├─ concept_node  (纯 LLM)           ─┤
+                └─ reject_node   (礼貌拒绝)          ─┘
 ```
 
-Supervisor 节点会经过两次。第一次通过结构化输出（`RouteDecision`）对问题分类；Agent 处理完返回后，State 中已有 `agent_result`，Supervisor 就对结果进行汇总，然后路由到 `END`。
+Supervisor 通过结构化输出（`RouteDecision`）把问题拆成 1~4 个任务，每个任务包含类别和子问题，每个类别最多一个。`dispatch_tasks` 把这些任务变成 `Send`，各 Agent 在同一步并行运行，并且只收到自己的任务。结果通过 `operator.add` reducer 追加到 `agent_results`，最后由 `summary_node` 合并成一个回答。
 
 ## 目录结构
 
@@ -43,7 +44,8 @@ Supervisor 节点会经过两次。第一次通过结构化输出（`RouteDecisi
 ├── mcp_server.py        阅读笔记 MCP Server（端口 8001）
 ├── agents/
 │   ├── common.py        公共方法：创建模型、调用 Agent、节点返回值
-│   ├── supervisor.py    分类 + 汇总 + 路由函数
+│   ├── supervisor.py    拆分任务 + 用 Send 分派
+│   ├── summary.py       把各 Agent 的结果合并成最终回复
 │   ├── search.py        论文检索 Agent（OpenAlex API）
 │   ├── library.py       本地论文库 Agent（RAG）
 │   ├── notes.py         阅读笔记 Agent（通过 MCP 查询）
@@ -84,7 +86,7 @@ cp .env.example .env            # 可选：LangSmith 追踪
 
 ```bash
 python mcp_server.py      # 终端 1
-python main.py            # 终端 2：运行 5 个测试问题
+python main.py            # 终端 2：运行 7 个测试问题
 python main.py -i         # 或者交互式提问
 python app.py             # 或者打开 Gradio 界面 http://127.0.0.1:7860
 ```
@@ -93,19 +95,22 @@ python app.py             # 或者打开 Gradio 界面 http://127.0.0.1:7860
 
 ## 示例问题
 
-| 问题 | 路由 |
-| --- | --- |
-| Find recent papers about foundation models for cell segmentation | `search` |
-| Which datasets and metrics did CellViT use? | `library` |
-| What did I note about HoVer-Net?（用户 1） | `notes` |
-| What is a Vision Transformer? | `concept` |
-| Will the stock market go up today? | `other` |
+| 问题                                                             | 路由                    |
+| ---------------------------------------------------------------- | ----------------------- |
+| Find recent papers about foundation models for cell segmentation | `search`              |
+| Which datasets and metrics did CellViT use?                      | `library`             |
+| What did I note about HoVer-Net?（用户 1）                       | `notes`               |
+| What is a Vision Transformer?                                    | `concept`             |
+| Will the stock market go up today?                               | `other`               |
+| Compare CellViT with my notes on HoVer-Net                       | `library` + `notes` |
+| What is a Vision Transformer, and what did I note about CellViT? | `concept` + `notes` |
 
 `notes` 的模拟用户：用户 `1` 和用户 `2` 有阅读笔记，用户 `99` 没有。
 
-## 已知局限（v0.1）
+## 已知局限（v0.2）
 
-- 每个问题只会交给一个 Agent。需要多个 Agent 配合的问题（例如"把 CellViT 和我对 HoVer-Net 的笔记做个对比"）目前处理不好。
+- Agent 之间只能并行，不能使用彼此的结果。例如"根据我的待读列表找相关新论文"需要先查 `notes` 再 `search`，目前还不支持。
+- 合并结果时，汇总仍可能加入一些不在任何 Agent 结果里的小推断。
 - 没有对话记忆，每个问题都独立回答。
 - 检索结果按相关性排序，会偏向高引用的老论文，问题里的 "recent" 会被忽略。
 - 检索 API 失败时，Agent 会如实告诉用户，不做重试。

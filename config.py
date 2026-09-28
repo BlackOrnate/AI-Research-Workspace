@@ -21,6 +21,11 @@ OPENALEX_API_URL = "https://api.openalex.org/works"
 OPENALEX_MAX_RESULTS = 5
 OPENALEX_TIMEOUT = 15  # seconds
 
+# Fallback paper search when OpenAlex fails (e.g. its daily limit is reached): public arXiv API, no key needed
+ARXIV_API_URL = "https://export.arxiv.org/api/query"
+ARXIV_MAX_RESULTS = 5
+ARXIV_TIMEOUT = 15  # seconds
+
 # MCP Server: uses port 8001 to avoid clashing with other local servers on 8000
 MCP_HOST = "127.0.0.1"
 MCP_PORT = 8001
