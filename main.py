@@ -1,4 +1,4 @@
-"""Command-line runner: python main.py        run the five test questions
+"""Command-line runner: python main.py        run the seven test questions
                        python main.py -i     ask questions interactively"""
 import asyncio
 import sys
@@ -12,7 +12,14 @@ TEST_CASES = [
     "What did I note about HoVer-Net?",
     "What is a Vision Transformer?",
     "Will the stock market go up today?",
+    # Need several Agents at once
+    "Compare CellViT with my notes on HoVer-Net",
+    "What is a Vision Transformer, and what did I note about CellViT?",
 ]
+
+
+def format_tasks(tasks: list[dict]) -> str:
+    return "\n".join(f"  - [{t['category']}] {t['sub_question']}" for t in tasks)
 
 
 async def ask(question: str, user_id: int = 1) -> dict:
@@ -28,7 +35,7 @@ async def run_tests():
     for question in TEST_CASES:
         print(f"\n{'=' * 20} Question: {question} {'=' * 20}")
         result = await ask(question)
-        print(f"\n>>> Category: {result['category']}")
+        print(f"\n>>> Tasks:\n{format_tasks(result['tasks'])}")
         print(f">>> Final answer:\n{result['final_answer']}")
 
 
@@ -39,7 +46,7 @@ async def interactive():
         if not question:
             break
         result = await ask(question, user_id)
-        print(f"\n>>> [{result['category']}]\n{result['final_answer']}")
+        print(f"\n>>> Tasks:\n{format_tasks(result['tasks'])}\n\n{result['final_answer']}")
 
 
 if __name__ == "__main__":

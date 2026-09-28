@@ -3,7 +3,7 @@ from langchain.agents import create_agent
 from langchain.agents.middleware import ModelRetryMiddleware
 
 from agents.common import agent_update, ask_agent, create_model
-from state import State
+from state import TaskState
 
 
 REJECT_TEXT = (
@@ -27,7 +27,8 @@ reject_agent = create_agent(
 )
 
 
-async def reject_node(state: State):
+async def reject_node(state: TaskState):
     print("~~~~~~This is Reject Agent~~~~~~")
-    answer = await ask_agent(reject_agent, state["messages"][0].content, REJECT_TEXT)
-    return agent_update(answer)
+    task = state["task"]
+    answer, tokens = await ask_agent(reject_agent, task["sub_question"], REJECT_TEXT)
+    return agent_update(task, answer, tokens)

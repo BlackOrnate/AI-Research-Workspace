@@ -11,7 +11,7 @@ from langchain_text_splitters import MarkdownHeaderTextSplitter
 
 from agents.common import agent_update, ask_agent, create_model
 from config import EMBEDDING_MODEL, INDEX_PATH, PAPERS_PATH
-from state import State
+from state import TaskState
 
 
 def library_titles() -> list[str]:
@@ -79,7 +79,8 @@ library_agent = create_agent(
 )
 
 
-async def library_node(state: State):
+async def library_node(state: TaskState):
     print("~~~~~~This is Library Agent~~~~~~")
-    answer = await ask_agent(library_agent, state["messages"][0].content, LIBRARY_FAIL_TEXT)
-    return agent_update(answer)
+    task = state["task"]
+    answer, tokens = await ask_agent(library_agent, task["sub_question"], LIBRARY_FAIL_TEXT)
+    return agent_update(task, answer, tokens)
