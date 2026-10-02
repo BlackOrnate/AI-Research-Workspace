@@ -1,0 +1,18 @@
+{"question": "Which datasets and metrics did CellViT use?", "papers": ["CellViT"], "online": false}
+{"question": "What backbone does MedSAM use?", "papers": ["MedSAM"], "online": false}
+{"question": "Who wrote the Segment Anything paper?", "papers": ["Segment Anything (SAM)"], "online": false}
+{"question": "What are the limitations of hovernet?", "papers": ["HoVer-Net"], "online": false, "note": "Spelling variant of HoVer-Net"}
+{"question": "What does SAM use as its image encoder?", "papers": ["Segment Anything (SAM)"], "online": false, "note": "Short form of the title"}
+{"question": "Compare CellViT and HoVer-Net", "papers": ["CellViT", "HoVer-Net"], "online": false}
+{"question": "How does Cellpose differ from StarDist?", "papers": ["Cellpose", "StarDist"], "online": false}
+{"question": "What is the difference between MedSAM and SAM?", "papers": ["MedSAM", "Segment Anything (SAM)"], "online": false, "note": "SAM must not be confused with MedSAM"}
+{"question": "Which paper uses star-convex polygons to detect nuclei?", "papers": ["StarDist"], "online": false, "note": "Describes a library paper without naming it"}
+{"question": "Which method predicts horizontal and vertical distance maps to split touching nuclei?", "papers": ["HoVer-Net"], "online": false, "note": "Describes a library paper without naming it"}
+{"question": "What datasets did the Mask R-CNN paper evaluate on?", "papers": [], "online": true}
+{"question": "What is the architecture of nnU-Net?", "papers": [], "online": true}
+{"question": "What backbone does DINOv2 use?", "papers": [], "online": true}
+{"question": "Tell me about the Swin Transformer paper", "papers": [], "online": true}
+{"question": "Explain CellViT.", "papers": ["CellViT"], "online": false}
+{"question": "Explain CellViT++.", "papers": [], "online": true, "note": "CellViT++ is not in the library and must not match CellViT"}
+{"question": "What is Cellpose-SAM?", "papers": [], "online": true, "note": "Must not match Cellpose or SAM"}
+{"question": "What is UNI2?", "papers": [], "online": true}

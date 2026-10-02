@@ -11,7 +11,7 @@ Each specialist Agent demonstrates a different technique:
 | Agent | Handles | Technique |
 | --- | --- | --- |
 | `search` | Finding papers online | **Tool calling** against the public OpenAlex API |
-| `library` | Details of papers in the local library | **RAG** over a Markdown paper library with **FAISS** |
+| `library` | Details of a specific paper | **Subgraph** with deterministic routing: a paper found in the local metadata goes to **RAG** with **FAISS** filtered by `paper_id`, any other paper to the online search |
 | `notes` | The user's own reading list and notes | Tool calling + **MCP** Server, `user_id` injected through runtime context |
 | `concept` | General research concepts and terms | Plain LLM, no tools |
 | `reject` | Questions unrelated to research | Polite refusal |
@@ -45,15 +45,22 @@ The Supervisor uses structured output (`RouteDecision`) to split the question in
 │   ├── supervisor.py    Split the question into tasks + dispatch them with Send
 │   ├── summary.py       Merge the Agents' results into the final reply
 │   ├── search.py        Paper search Agent (OpenAlex API)
-│   ├── library.py       Paper library Agent (RAG)
+│   ├── library.py       Paper details Agent: resolve -> local RAG or online search -> answer
+│   ├── paper_resolver.py  Is this paper in the local library? (title / alias match)
 │   ├── notes.py         Reading notes Agent (via MCP)
 │   ├── concept.py       Concept explanation Agent
 │   └── reject.py        Polite refusal
 ├── graph.py             Builds the StateGraph
 ├── main.py              Command-line runner
 ├── app.py               Gradio demo UI
+├── evals/
+│   ├── router_cases.jsonl  Labeled questions: expected categories for each
+│   ├── eval_router.py      Router eval: accuracy, per-category precision/recall
+│   ├── library_cases.jsonl Labeled questions: which source each one needs
+│   └── eval_library.py     Library Agent eval: did it use the right source
 └── data/
-    └── papers.md        Local paper library (mock summaries)
+    ├── papers.md        Local paper library (mock summaries)
+    └── papers.json      Paper metadata: paper_id, title, aliases
 ```
 
 ## Quick Start
@@ -87,9 +94,11 @@ python mcp_server.py      # terminal 1
 python main.py            # terminal 2: run the seven test questions
 python main.py -i         # or ask questions interactively
 python app.py             # or open the Gradio UI at http://127.0.0.1:7860
+python -m evals.eval_router --runs 3   # router eval (no MCP Server needed)
+python -m evals.eval_library          # library Agent eval (online cases need network)
 ```
 
-The FAISS index is built from `data/papers.md` on first run. Delete `faiss_index_papers/` after editing the paper library to rebuild it.
+The FAISS index is built from `data/papers.md` on first run. Delete `faiss_index_papers/` after editing the paper library to rebuild it. Every paper in `papers.md` needs an entry in `papers.json`; its aliases decide which names find it.
 
 ## Example Questions
 
@@ -105,8 +114,11 @@ The FAISS index is built from `data/papers.md` on first run. Delete `faiss_index
 
 Mock users for `notes`: user `1` and user `2` have reading notes, user `99` has none.
 
-## Known Limitations (v0.2)
+## Known Limitations (v0.3)
 
+- A question that describes a library paper without naming it (e.g. "Which paper uses star-convex polygons?") can't find it and goes to the online search.
+- The online search uses the whole question as the query, which sometimes misses the paper.
+- A question that mixes a library paper and an unknown one, like "Compare CellViT and Mask R-CNN", only uses the library, so the unknown paper is left out.
 - Agents run in parallel but can't use each other's results. A question like "Find new papers related to what's on my to-read list" needs `notes` first and then `search`, which isn't supported yet.
 - When merging results, the summary can still add small inferences that are not in any Agent's result.
 - No conversation memory: every question is answered on its own.

@@ -1,10 +1,10 @@
 """Other questions: politely decline."""
+
 from langchain.agents import create_agent
 from langchain.agents.middleware import ModelRetryMiddleware
 
 from agents.common import agent_update, ask_agent, create_model
 from state import TaskState
-
 
 REJECT_TEXT = (
     "Sorry, I'm a research assistant and can only help with research-related questions, "

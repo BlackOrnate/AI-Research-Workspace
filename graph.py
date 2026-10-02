@@ -22,7 +22,9 @@ def build_graph():
 
     # START -> supervisor splits the question -> Agents run in parallel -> summary merges -> END
     builder.add_edge(START, "supervisor_node")
-    builder.add_conditional_edges("supervisor_node", dispatch_tasks, list(CATEGORY_TO_NODE.values()))
+    builder.add_conditional_edges(
+        "supervisor_node", dispatch_tasks, list(CATEGORY_TO_NODE.values())
+    )
     # summary_node runs once, after every Agent sent in the same step has finished
     for node in CATEGORY_TO_NODE.values():
         builder.add_edge(node, "summary_node")

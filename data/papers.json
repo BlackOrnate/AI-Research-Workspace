@@ -1,0 +1,61 @@
+[
+  {
+    "paper_id": "hovernet_2019",
+    "title": "HoVer-Net",
+    "full_title": "HoVer-Net: Simultaneous Segmentation and Classification of Nuclei in Multi-Tissue Histology Images",
+    "aliases": [
+      "HoVer-Net",
+      "HoVerNet",
+      "HoVer Net"
+    ],
+    "year": 2019
+  },
+  {
+    "paper_id": "cellvit_2024",
+    "title": "CellViT",
+    "full_title": "CellViT: Vision Transformers for Precise Cell Segmentation and Classification",
+    "aliases": [
+      "CellViT",
+      "Cell ViT"
+    ],
+    "year": 2024
+  },
+  {
+    "paper_id": "cellpose_2021",
+    "title": "Cellpose",
+    "full_title": "Cellpose: a generalist algorithm for cellular segmentation",
+    "aliases": [
+      "Cellpose"
+    ],
+    "year": 2021
+  },
+  {
+    "paper_id": "stardist_2018",
+    "title": "StarDist",
+    "full_title": "Cell Detection with Star-convex Polygons",
+    "aliases": [
+      "StarDist"
+    ],
+    "year": 2018
+  },
+  {
+    "paper_id": "sam_2023",
+    "title": "Segment Anything (SAM)",
+    "full_title": "Segment Anything",
+    "aliases": [
+      "Segment Anything",
+      "SAM"
+    ],
+    "year": 2023
+  },
+  {
+    "paper_id": "medsam_2024",
+    "title": "MedSAM",
+    "full_title": "Segment Anything in Medical Images",
+    "aliases": [
+      "MedSAM",
+      "Segment Anything in Medical Images"
+    ],
+    "year": 2024
+  }
+]
