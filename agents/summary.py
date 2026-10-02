@@ -1,10 +1,10 @@
 """Summary: merges the results of every Agent into one final reply."""
+
 from langchain.agents import create_agent
 from langchain.agents.middleware import ModelRetryMiddleware
 
 from agents.common import ask_agent, create_model, message_text
 from state import AgentResult, State
-
 
 # Summarizing only reorganizes existing content and needs no creativity, so temperature is 0
 summary_agent = create_agent(
@@ -29,12 +29,17 @@ summary_agent = create_agent(
 
 def ordered_results(state: State) -> list[AgentResult]:
     """Parallel branches may finish in any order; sort results back into the order of the tasks."""
-    order = {task["category"]: i for i, task in enumerate(state["tasks"])}
-    return sorted(state["agent_results"], key=lambda r: order.get(r["category"], len(order)))
+    tasks = state.get("tasks", [])
+    order = {task["category"]: i for i, task in enumerate(tasks)}
+    return sorted(
+        state["agent_results"], key=lambda r: order.get(r["category"], len(order))
+    )
 
 
 def format_results(results: list[AgentResult]) -> str:
-    return "\n\n".join(f"### [{r['category']}] {r['sub_question']}\n{r['answer']}" for r in results)
+    return "\n\n".join(
+        f"### [{r['category']}] {r['sub_question']}\n{r['answer']}" for r in results
+    )
 
 
 async def summarize(state: State) -> tuple[str, int]:
@@ -59,4 +64,8 @@ async def summary_node(state: State):
     print("~~~~~~This is Summary~~~~~~")
     final_answer, tokens = await summarize(state)
     print(final_answer)
-    return {"final_answer": final_answer, "summary_tokens": tokens, "messages": [{"role": "ai", "content": final_answer}]}
+    return {
+        "final_answer": final_answer,
+        "summary_tokens": tokens,
+        "messages": [{"role": "ai", "content": final_answer}],
+    }

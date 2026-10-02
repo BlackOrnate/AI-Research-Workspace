@@ -1,4 +1,5 @@
 """Reading notes Agent: queries the current user's reading list and notes through the MCP Server."""
+
 from dataclasses import dataclass
 
 from langchain.agents import create_agent
@@ -9,7 +10,6 @@ from langchain_mcp_adapters.client import MultiServerMCPClient
 from agents.common import agent_update, ask_agent, create_model
 from config import MCP_URL
 from state import TaskState
-
 
 mcp_client = MultiServerMCPClient(
     {"workspace": {"url": MCP_URL, "transport": "streamable_http"}}
@@ -65,11 +65,14 @@ notes_agent = create_agent(
 async def notes_node(state: TaskState):
     print("~~~~~~This is Notes Agent~~~~~~")
     task = state["task"]
+    user_id = state.get("user_id")
+    if user_id is None:
+        raise ValueError("user_id is required to query reading notes")
     answer, tokens = await ask_agent(
         notes_agent,
         task["sub_question"],
         NOTES_FAIL_TEXT,
         # Pass the user_id sent by the supervisor to the tool
-        context=UserContext(user_id=state.get("user_id")),
+        context=UserContext(user_id=user_id),
     )
     return agent_update(task, answer, tokens)

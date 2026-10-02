@@ -15,6 +15,10 @@ def message_text(content: Any) -> str:
     """Message content can be a string or a list of content blocks; return it as plain text."""
     if isinstance(content, str):
         return content
+    if isinstance(content, dict):
+        text = content.get("text") or content.get("content")
+        if isinstance(text, str):
+            return text
     if isinstance(content, list):
         parts: list[str] = []
         for item in content:
@@ -25,10 +29,6 @@ def message_text(content: Any) -> str:
                 if isinstance(text, str):
                     parts.append(text)
         return "".join(parts)
-    if isinstance(content, dict):
-        text = content.get("text") or content.get("content")
-        if isinstance(text, str):
-            return text
     return str(content)
 
 

@@ -1,10 +1,10 @@
 """Command-line runner: python main.py        run the seven test questions
-                       python main.py -i     ask questions interactively"""
+python main.py -i     ask questions interactively"""
+
 import asyncio
 import sys
 
 from graph import graph
-
 
 TEST_CASES = [
     "Find recent papers about foundation models for cell segmentation",
@@ -24,9 +24,13 @@ def format_tasks(tasks: list[dict]) -> str:
 
 async def ask(question: str, user_id: int = 1) -> dict:
     return await graph.ainvoke(
-        {"messages": [{"role": "user", "content": question}], "user_id": user_id},
+        {"messages": [{"role": "user", "content": question}], "user_id": user_id},  # type: ignore[arg-type]
         # Run name, tags and metadata shown in LangSmith, for easier filtering
-        config={"run_name": "Research Assistant", "tags": ["cli"], "metadata": {"user_id": user_id}},
+        config={
+            "run_name": "Research Assistant",
+            "tags": ["cli"],
+            "metadata": {"user_id": user_id},
+        },
     )
 
 
@@ -46,7 +50,9 @@ async def interactive():
         if not question:
             break
         result = await ask(question, user_id)
-        print(f"\n>>> Tasks:\n{format_tasks(result['tasks'])}\n\n{result['final_answer']}")
+        print(
+            f"\n>>> Tasks:\n{format_tasks(result['tasks'])}\n\n{result['final_answer']}"
+        )
 
 
 if __name__ == "__main__":

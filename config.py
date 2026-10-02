@@ -15,6 +15,10 @@ EMBEDDING_MODEL = "nomic-embed-text-v2-moe:latest"
 # RAG: local paper library and vector store location
 PAPERS_PATH = BASE_DIR / "data" / "papers.md"
 INDEX_PATH = BASE_DIR / "faiss_index_papers"
+# Paper metadata (id, title, aliases): used to decide whether a paper is in the local library
+PAPERS_METADATA_PATH = BASE_DIR / "data" / "papers.json"
+# Chunks retrieved from each local paper
+LIBRARY_TOP_K = 3
 
 # Paper search: public OpenAlex API, no key needed
 OPENALEX_API_URL = "https://api.openalex.org/works"

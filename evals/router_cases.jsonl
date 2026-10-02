@@ -1,0 +1,35 @@
+{"question": "Find recent papers about foundation models for cell segmentation", "expected": ["search"]}
+{"question": "Are there any new papers on nucleus segmentation in H&E images?", "expected": ["search"]}
+{"question": "Search for papers about self-supervised pretraining for histopathology", "expected": ["search"]}
+{"question": "Tell me about the Mask R-CNN paper", "expected": ["library"], "note": "A specific named paper; it is not in the local library, so the library Agent looks it up online"}
+{"question": "Which datasets and metrics did CellViT use?", "expected": ["library"]}
+{"question": "What backbone does MedSAM use?", "expected": ["library"]}
+{"question": "What are the limitations of StarDist?", "expected": ["library"]}
+{"question": "What is HoVer-Net?", "expected": ["library"], "note": "Sounds like a concept question, but HoVer-Net is a paper in the local library"}
+{"question": "Tell me about the Segment Anything paper", "expected": ["library"], "note": "In the library as \"Segment Anything (SAM)\""}
+{"question": "Compare CellViT and HoVer-Net", "expected": ["library"], "note": "Rule 2: the library assistant looks up both papers in one task"}
+{"question": "How does Cellpose differ from StarDist?", "expected": ["library"], "note": "Both papers are in the library, so one library task"}
+{"question": "What did I note about HoVer-Net?", "expected": ["notes"]}
+{"question": "Which papers are still on my to-read list?", "expected": ["notes"]}
+{"question": "What was the last paper I read?", "expected": ["notes"]}
+{"question": "What is a Vision Transformer?", "expected": ["concept"]}
+{"question": "What does Panoptic Quality measure?", "expected": ["concept"]}
+{"question": "Explain the difference between semantic and instance segmentation", "expected": ["concept"]}
+{"question": "Will the stock market go up today?", "expected": ["other"]}
+{"question": "Write me a poem about autumn", "expected": ["other"]}
+{"question": "What's a good recipe for pasta?", "expected": ["other"]}
+{"question": "Compare CellViT with my notes on HoVer-Net", "expected": ["library", "notes"]}
+{"question": "What is a Vision Transformer, and what did I note about CellViT?", "expected": ["concept", "notes"]}
+{"question": "Find recent papers about foundation models for cell segmentation, and explain what Panoptic Quality measures", "expected": ["search", "concept"]}
+{"question": "What datasets did MedSAM use, and are there newer papers that build on it?", "expected": ["library", "search"]}
+{"question": "Explain what a U-Net is and tell me which papers I'm currently reading", "expected": ["concept", "notes"]}
+{"question": "What are the limitations of StarDist, and did I write anything about it?", "expected": ["library", "notes"]}
+{"question": "What did I think of Cellpose compared to StarDist?", "expected": ["notes"], "note": "Names two library papers, but asks only for the user's own opinion"}
+{"question": "Have I read Cellpose yet?", "expected": ["notes"], "note": "Reading progress, with no word like \"notes\" or \"list\""}
+{"question": "Recommend papers similar to MedSAM", "expected": ["search"], "note": "MedSAM is in the library, but the user wants other papers"}
+{"question": "Who are the authors of the Cellpose paper?", "expected": ["library"]}
+{"question": "What is U-Net?", "expected": ["concept"], "note": "A method name that is not in the library, asked as a general concept"}
+{"question": "CellViT 用了哪些数据集？", "expected": ["library"], "note": "Question in Chinese"}
+{"question": "给我解释一下什么是 Panoptic Quality", "expected": ["concept"], "note": "Question in Chinese"}
+{"question": "Find new papers related to what's on my to-read list", "expected": ["notes", "search"], "note": "Needs notes first, then search (serial dependency, not supported yet); both are still needed"}
+{"question": "Which datasets did the Mask R-CNN paper evaluate on?", "expected": ["library"], "note": "Details of a named paper that is not in the local library"}
